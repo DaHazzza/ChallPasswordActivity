@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Challenge</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .container {
+        background: white;
+        padding: 30px;
+        width: 350px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    .field {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        background: #0066cc;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background: #0052a3;
+    }
+
+    .error {
+        color: #cc0000;
+        margin-top: 10px;
+    }
+
+    .success {
+        text-align: center;
+    }
+
+    .attempts {
+        margin-top: 10px;
+        color: #666;
+        font-size: 0.9em;
+    }
+</style>
+</head>
+<body>
+
+<div class="container" id="loginContainer">
+    <h2>Demo Login</h2>
+
+    <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" value="john.smith" readonly>
+    </div>
+
+    <div class="field">
+        <label>Password</label>
+        <input type="password" id="password" autofocus>
+    </div>
+
+    <button onclick="login()">Sign In</button>
+
+    <div class="error" id="message"></div>
+    <div class="attempts" id="attempts">Attempts: 0</div>
+</div>
+
+<script>
+    // Demo only - visible in source code
+    const correctPassword = "Password123!";
+    let attemptCount = 0;
+
+    function login() {
+        const password = document.getElementById("password").value;
+        const message = document.getElementById("message");
+
+        attemptCount++;
+        document.getElementById("attempts").textContent =
+            "Attempts: " + attemptCount;
+
+        if (password === correctPassword) {
+            document.getElementById("loginContainer").innerHTML = `
+                <div class="success">
+                    <h2>✅ Login Successful</h2>
+                    <p>Welcome John Smith.</p>
+                    <p>You guessed the correct password after ${attemptCount} attempt(s).</p>
+                </div>
+            `;
+        } else {
+            message.textContent = "Incorrect password. Please try again.";
+            document.getElementById("password").value = "";
+            document.getElementById("password").focus();
+        }
+    }
+
+    document.getElementById("password").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            login();
+        }
+    });
+</script>
+
+</body>
+</html>
