@@ -3,29 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Challenge</title>
+<title>Password Guessing Challenge</title>
 
 <style>
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: Arial, sans-serif;
         background: #f5f7fa;
+        margin: 0;
+        padding: 20px;
         display: flex;
         justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
+        align-items: flex-start;
+        min-height: 100vh;
     }
 
     .container {
         background: white;
-        padding: 30px;
-        width: 350px;
-        border-radius: 8px;
+        padding: 25px;
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     h2 {
         margin-top: 0;
+        text-align: center;
     }
 
     .field {
@@ -41,18 +48,22 @@
     input[type="text"],
     input[type="password"] {
         width: 100%;
-        padding: 10px;
-        box-sizing: border-box;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
     }
 
     button {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border: none;
+        border-radius: 6px;
         background: #0066cc;
         color: white;
         cursor: pointer;
         font-size: 16px;
+        font-weight: bold;
     }
 
     button:hover {
@@ -60,25 +71,92 @@
     }
 
     .error {
+        margin-top: 12px;
         color: #cc0000;
+        font-weight: bold;
+    }
+
+    .attempts {
         margin-top: 10px;
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .guesses {
+        margin-top: 20px;
+    }
+
+    .guesses h3 {
+        margin-bottom: 10px;
+    }
+
+    #guessList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    #guessList li {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        word-break: break-word;
+    }
+
+    #guessList li:last-child {
+        border-bottom: none;
+    }
+
+    .guess-correct {
+        background-color: #d4edda;
+        color: #155724;
+        font-weight: bold;
+    }
+
+    .guess-hint {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .guess-wrong {
+        background-color: #f8d7da;
+        color: #721c24;
     }
 
     .success {
         text-align: center;
     }
 
-    .attempts {
-        margin-top: 10px;
-        color: #666;
-        font-size: 0.9em;
+    .winner {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+        }
     }
 </style>
 </head>
+
 <body>
 
 <div class="container" id="loginContainer">
-    <h2>Demo Login</h2>
+
+    <h2>🔐 Password Challenge</h2>
+
+    <p>
+        Can you guess John Smith's password?
+    </p>
 
     <div class="field">
         <label>Username</label>
@@ -93,42 +171,136 @@
     <button onclick="login()">Sign In</button>
 
     <div class="error" id="message"></div>
-    <div class="attempts" id="attempts">Attempts: 0</div>
+
+    <div class="attempts" id="attempts">
+        Attempts: 0
+    </div>
+
+    <div class="guesses">
+        <h3>Previous Guesses</h3>
+        <ul id="guessList"></ul>
+    </div>
+
 </div>
 
 <script>
-    // Demo only - visible in source code
+
+    // DEMO ONLY
     const correctPassword = "Ralph1995!";
+
     let attemptCount = 0;
+    let previousGuesses = [];
 
     function login() {
-        const password = document.getElementById("password").value;
-        const message = document.getElementById("message");
+
+        const password =
+            document.getElementById("password").value.trim();
+
+        const message =
+            document.getElementById("message");
+
+        if (!password) {
+            return;
+        }
 
         attemptCount++;
+
         document.getElementById("attempts").textContent =
             "Attempts: " + attemptCount;
 
+        previousGuesses.push(password);
+
+        renderGuesses();
+
         if (password === correctPassword) {
+
             document.getElementById("loginContainer").innerHTML = `
                 <div class="success">
+                    <div class="winner">🏆 Winner!</div>
+
                     <h2>✅ Login Successful</h2>
+
                     <p>Welcome John Smith.</p>
-                    <p>You guessed the correct password after ${attemptCount} attempt(s). Show this to the presenter for a prize!</p>
+
+                    <p>
+                        You guessed the correct password after
+                        <strong>${attemptCount}</strong> attempt(s).
+                    </p>
+
+                    <p>
+                        Show this screen to the presenter for a prize!
+                    </p>
                 </div>
             `;
+
         } else {
-            message.textContent = "Incorrect password. Please try again.";
+
+            message.textContent =
+                "Incorrect password. Please try again.";
+
             document.getElementById("password").value = "";
             document.getElementById("password").focus();
         }
     }
 
-    document.getElementById("password").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            login();
-        }
-    });
+    function renderGuesses() {
+
+        const list =
+            document.getElementById("guessList");
+
+        list.innerHTML = "";
+
+        previousGuesses.forEach((guess, index) => {
+
+            const item =
+                document.createElement("li");
+
+            const hasName =
+                guess.toLowerCase().includes("Ralph");
+
+            const hasYear =
+                guess.includes("1995");
+
+            item.textContent =
+                `${index + 1}. ${guess}`;
+
+            if (guess === correctPassword) {
+
+                item.classList.add("guess-correct");
+                item.textContent += " ✅ Correct";
+
+            }
+            else if (hasName) {
+
+                item.classList.add("guess-hint");
+                item.textContent += " 🟡 Close";
+
+            }
+            else if (hasYear) {
+
+                item.classList.add("guess-hint");
+                item.textContent += " 🟡 Close";
+
+            }
+            else {
+
+                item.classList.add("guess-wrong");
+                item.textContent += " ❌";
+            }
+
+            list.appendChild(item);
+        });
+    }
+
+    document.getElementById("password")
+        .addEventListener("keypress", function(e) {
+
+            if (e.key === "Enter") {
+                login();
+            }
+
+        });
+
 </script>
 
 </body>
